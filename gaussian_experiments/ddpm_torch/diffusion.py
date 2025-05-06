@@ -278,7 +278,7 @@ class GaussianDiffusion:
         output = torch.where(t.to(kl.device) > 0, kl, decoder_nll)
         return (output, pred_x_0) if return_pred else output
 
-    def train_losses(self, denoise_fn, x_0, t, noise=None):
+    def train_losses(self, denoise_fn, x_0, t, noise=None, x_old=None):
         if noise is None:
             noise = torch.randn_like(x_0)
         x_t = self.q_sample(x_0, t, noise=noise)
@@ -304,7 +304,6 @@ class GaussianDiffusion:
         elif self.loss_type == "rssm":
             noise_2 = torch.randn_like(x_0)
             if self.sampling_dist == 'uniform':
-                # x_t =
                 sample_xt = torch.rand_like(x_0) * 10 - 5
             elif self.sampling_dist == 'Gaussian':
                 sample_xt = torch.randn_like(x_0) * 3
@@ -317,6 +316,13 @@ class GaussianDiffusion:
                   + 0.2 * torch.exp(- torch.linalg.norm(tilde_x_0 + 3 * torch.ones_like(x_t), axis=1) ** 2 /2 ))
             model_out = denoise_fn(sample_xt, t)
             losses = energy * flat_mean((noise_2 - model_out).pow(2))
+        elif self.loss_type == "wis":
+            x_old = x_old + torch.randn_like(x_0) * 6.0
+            tilde_x = self.q_sample(x_old, t, noise=noise, scale=6.0) 
+            energy = 100 * (0.8 * torch.exp(- torch.linalg.norm(x_old - 3 * torch.ones_like(x_t), axis=1) ** 2 / 2)
+                  + 0.2 * torch.exp(- torch.linalg.norm(x_old + 3 * torch.ones_like(x_t), axis=1) ** 2 /2 ))
+            model_out = denoise_fn(tilde_x, t)
+            losses = energy * flat_mean((noise - model_out).pow(2))
         else:
             raise NotImplementedError(self.loss_type)
 

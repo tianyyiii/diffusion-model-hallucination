@@ -54,7 +54,10 @@ class Trainer:
         t = torch.randint(T, size=(B, ), dtype=torch.int64, device=self.device)
         if len(x.shape)==1:
             x = x.unsqueeze(1)
-        loss, model_out_norm = self.diffusion.train_losses(self.model, x_0=x, t=t)
+        x_old_shape = (B,) + self.shape
+        x_old = self.diffusion.p_sample(
+                denoise_fn=self.model, shape=x_old_shape, device=self.device, noise=None)
+        loss, model_out_norm = self.diffusion.train_losses(self.model, x_0=x, t=t, x_old=x_old)
         assert loss.shape == (B, )
         return loss, model_out_norm
 

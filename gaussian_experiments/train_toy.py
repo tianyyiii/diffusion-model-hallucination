@@ -29,7 +29,7 @@ def parse_arguments():
     parser.add_argument("--beta-end", default=0.3, type=float)
     parser.add_argument("--model-mean-type", choices=["mean", "x_0", "eps"], default="eps", type=str)
     parser.add_argument("--model-var-type", choices=["learned", "fixed-small", "fixed-large"], default="fixed-large", type=str)  # noqa
-    parser.add_argument("--loss-type", choices=["kl", "mse", "rssm"], default="rssm", type=str)
+    parser.add_argument("--loss-type", choices=["kl", "mse", "rssm", "wis"], default="wis", type=str)
     parser.add_argument("--sampling_dist", choices=["uniform", "pt", "Gaussian"], default="uniform", type=str)
     parser.add_argument("--image-dir", default="./images/train", type=str)
     parser.add_argument("--exp_str", default="0", type=str)

@@ -18,9 +18,9 @@ class GaussianDiffusion(diffusion.GaussianDiffusion):
 
 
 
-    def q_sample(self, x_0, t, noise=None):
+    def q_sample(self, x_0, t, noise=None, scale=1.0):
         if noise is None:
-            noise = torch.randn_like(x_0)
+            noise = torch.randn_like(x_0) * scale
         coef1 = self._extract(self.sqrt_alphas_bar, t, x_0)
         coef2 = self._extract(self.sqrt_one_minus_alphas_bar, t, x_0)
         return coef1 * x_0 + coef2 * noise
