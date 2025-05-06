@@ -317,7 +317,8 @@ class GaussianDiffusion:
             model_out = denoise_fn(sample_xt, t)
             losses = energy * flat_mean((noise_2 - model_out).pow(2))
         elif self.loss_type == "wis":
-            x_old = x_old + torch.randn_like(x_0) * 6.0
+            # x_old = x_old + torch.randn_like(x_0) * 6.0
+            x_old = torch.rand_like(x_0) * 20 - 10
             tilde_x = self.q_sample(x_old, t, noise=noise, scale=6.0) 
             energy = 100 * (0.8 * torch.exp(- torch.linalg.norm(x_old - 3 * torch.ones_like(x_t), axis=1) ** 2 / 2)
                   + 0.2 * torch.exp(- torch.linalg.norm(x_old + 3 * torch.ones_like(x_t), axis=1) ** 2 /2 ))
